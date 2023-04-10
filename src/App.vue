@@ -69,7 +69,7 @@ const checkData = async () => {
   if (city.value !== "") {
     response.value = await getPlaceData();
     city.value = "";
-    autocompletedCities.value = undefined;
+    autocompletedCities.value = {  };
   }
 };
 
