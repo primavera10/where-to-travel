@@ -30,14 +30,10 @@
           class="ml-4 focus:outline-none border-grey border rounded pl-2 py-1"
         />
       </div>
-      <div class="w-80 py-4 pr-4 mb-8 mt-2 " v-if="autocompletedCities!==undefined">
-        <div v-for="city in autocompletedCities.data"
-             @click="fillCity(city.name)"
-             :key="city.id"
-             class="cursor-pointer hover:text-white hover:bg-skyBlue">
-          {{ city.name }}
-        </div>
-      </div>
+      <Autocomplete class="w-80 py-4 pr-4 mb-8 mt-2 "
+                    v-if="autocompletedCities!==undefined"
+                    @select="fillCity"
+                    :autocompleted-cities="autocompletedCities" />
     </div>
     <div v-if="response">
       <div class="text-3xl text-center mb-14">
@@ -68,6 +64,7 @@
 <script setup lang="ts">
 import { ref, watch } from "vue";
 import { useDebounceFn } from "@vueuse/core";
+import Autocomplete from "@/components/Autocomplete.vue";
 
 const city = ref<string>("");
 const KEY = "5ae2e3f221c38a28845f05b6bce54ceec3074e30e4fc5e2df84867fe";
