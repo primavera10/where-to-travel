@@ -1,9 +1,9 @@
 <template>
   <div class="p-12">
-    <div class="flex flex-col items-center">
-      <div class="mt-10  flex items-center  gap-4" :class="{
+    <div class="flex flex-col items-center" :class="{
         'mb-14': autocompletedCities === undefined,
       }">
+      <div class="mt-10  flex items-center  gap-4">
         <input
           type="text"
           v-model="city"
@@ -14,21 +14,37 @@
           Search
         </button>
       </div>
-        <div class="w-80 py-4 pr-4 mb-8 mt-2 " v-if="autocompletedCities!==undefined">
-          <div v-for="city in autocompletedCities.data"
-               @click="fillCity(city.name)"
-               :key="city.id"
-               class="cursor-pointer hover:text-white hover:bg-skyBlue">
-            {{ city.name }}
+      <div class="flex mt-6 items-start">
+        <div>
+          <div>
+            Select search radius
+          </div>
+          <div class="mt-1 text-grey text-xs">
+            *Default - 2000 meters
           </div>
         </div>
+        <input
+          type="text"
+          v-model="radius"
+          placeholder="max 10000"
+          class="ml-4 focus:outline-none border-grey border rounded pl-2 py-1"
+        />
+      </div>
+      <div class="w-80 py-4 pr-4 mb-8 mt-2 " v-if="autocompletedCities!==undefined">
+        <div v-for="city in autocompletedCities.data"
+             @click="fillCity(city.name)"
+             :key="city.id"
+             class="cursor-pointer hover:text-white hover:bg-skyBlue">
+          {{ city.name }}
+        </div>
+      </div>
     </div>
     <div v-if="response">
       <div class="text-3xl text-center mb-14">
         Interesting places nearby {{ response.name }}
       </div>
-      <div v-if="radius" class="grid gap-4 grid-cols-3">
-        <div v-for="place in radius.features" :key="place.id"
+      <div v-if="placesNearby" class="grid gap-4 grid-cols-3">
+        <div v-for="place in placesNearby.features" :key="place.id"
              :class="{
           'hidden': place.properties.name === '',
              }"
@@ -56,8 +72,9 @@ import { useDebounceFn } from "@vueuse/core";
 const city = ref<string>("");
 const KEY = "5ae2e3f221c38a28845f05b6bce54ceec3074e30e4fc5e2df84867fe";
 const response = ref();
-const radius = ref();
+const placesNearby = ref();
 const autocompletedCities = ref();
+const radius = ref<string>("");
 
 
 let getPlaceData = async function() {
@@ -69,16 +86,16 @@ const checkData = async () => {
   if (city.value !== "") {
     response.value = await getPlaceData();
     city.value = "";
-    autocompletedCities.value = {  };
+    autocompletedCities.value = {};
   }
 };
 
 let getRadiusData = async function() {
-  let data = await fetch(`https://api.opentripmap.com/0.1/en/places/radius?radius=5000&lon=${response.value.lon}&lat=${response.value.lat}&apikey=${KEY}`);
+  let data = await fetch(`https://api.opentripmap.com/0.1/en/places/radius?radius=${hasRadius()}&lon=${response.value.lon}&lat=${response.value.lat}&apikey=${KEY}`);
   return await data.json();
 };
 let writeRadius = async () => {
-  radius.value = await getRadiusData();
+  placesNearby.value = await getRadiusData();
 };
 
 watch(response, () => {
@@ -89,6 +106,9 @@ watch(response, () => {
 watch(city, () => {
   if (city.value !== "") {
     debounce();
+  }
+  if (city.value === "") {
+    autocompletedCities.value = {};
   }
 });
 
@@ -107,7 +127,7 @@ let getAutoCompletedCities = async function() {
 };
 
 const writeAutocompletedCities = async () => {
-  if (city.value==='') {
+  if (city.value === "") {
     return autocompletedCities.value = undefined;
   }
   autocompletedCities.value = await getAutoCompletedCities();
@@ -115,9 +135,13 @@ const writeAutocompletedCities = async () => {
 
 const debounce = useDebounceFn(writeAutocompletedCities, 700);
 
-function fillCity(name:string){
+function fillCity(name: string) {
   city.value = name;
   checkData();
+}
+
+function hasRadius() {
+  return (radius.value !== "") ? radius.value : "2000";
 }
 
 </script>
