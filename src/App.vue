@@ -30,8 +30,8 @@
           class="ml-4 focus:outline-none border-grey border rounded pl-2 py-1"
         />
       </div>
-      <Autocomplete class="w-80 py-4 pr-4 mb-8 mt-2 "
-                    v-if="autocompletedCities!==undefined"
+      <Autocomplete class="w-80 py-4 pr-4 mb-8 mt-2 autocompleteShadow rounded-lg pl-2"
+                    v-if="autocompletedCities.length!== 0"
                     @select="fillCity"
                     :autocompleted-cities="autocompletedCities" />
     </div>
@@ -66,11 +66,12 @@ import { ref, watch } from "vue";
 import { useDebounceFn } from "@vueuse/core";
 import Autocomplete from "@/components/Autocomplete.vue";
 
+
 const city = ref<string>("");
 const KEY = "5ae2e3f221c38a28845f05b6bce54ceec3074e30e4fc5e2df84867fe";
 const response = ref();
 const placesNearby = ref();
-const autocompletedCities = ref();
+const autocompletedCities = ref([]);
 const radius = ref<string>("");
 
 
@@ -83,7 +84,7 @@ const checkData = async () => {
   if (city.value !== "") {
     response.value = await getPlaceData();
     city.value = "";
-    autocompletedCities.value = {};
+    autocompletedCities.value = [];
   }
 };
 
@@ -105,7 +106,7 @@ watch(city, () => {
     debounce();
   }
   if (city.value === "") {
-    autocompletedCities.value = {};
+    autocompletedCities.value = [];
   }
 });
 
@@ -119,15 +120,21 @@ const options = {
 
 
 let getAutoCompletedCities = async function() {
-  let data = await fetch(`https://wft-geo-db.p.rapidapi.com/v1/geo/cities?namePrefix=${city.value}&limit=10`, options);
-  return await data.json();
+  return await fetch(`https://wft-geo-db.p.rapidapi.com/v1/geo/cities?namePrefix=${city.value}&limit=10`, options)
+    .then((e) => e.json());
+
+
 };
 
 const writeAutocompletedCities = async () => {
   if (city.value === "") {
-    return autocompletedCities.value = undefined;
+    return autocompletedCities.value = [];
   }
-  autocompletedCities.value = await getAutoCompletedCities();
+  let data = await getAutoCompletedCities();
+  let a = data.data.map((obj: object) => Object.values(obj));
+  autocompletedCities.value = a.map((elem: Array<any>) => {
+    return elem[3];
+  });
 };
 
 const debounce = useDebounceFn(writeAutocompletedCities, 700);
@@ -142,4 +149,9 @@ function hasRadius() {
 }
 
 </script>
+<style scoped>
+.autocompleteShadow {
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+}
+</style>
 

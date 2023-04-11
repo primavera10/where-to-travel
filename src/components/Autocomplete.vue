@@ -1,10 +1,9 @@
 <template>
 <div>
-  <div v-for="city in autocompletedCities.data"
-       @click="$emit('select', city.name)"
-       :key="city.id"
+  <div v-for="city in autocompletedCities"
+       @click="$emit('select', city)"
        class="cursor-pointer hover:text-white hover:bg-skyBlue">
-    {{ city.name }}
+    {{ city }}
   </div>
 </div>
 </template>
@@ -12,7 +11,7 @@
 <script setup lang="ts">
 const prop = defineProps({
   autocompletedCities: {
-    type: Object,
+    type: Array,
     required: true,
   },
 });
