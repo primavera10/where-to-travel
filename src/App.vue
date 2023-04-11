@@ -1,20 +1,26 @@
 <template>
   <div class="p-12">
-    <div class="flex flex-col items-center" :class="{
-        'mb-14': autocompletedCities === undefined,
+    <div class="flex flex-col  items-center" :class="{
+        'mb-14': autocompletedCities.length === 0,
       }">
-      <div class="mt-10  flex items-center  gap-4">
-        <input
-          type="text"
-          v-model="city"
-          class="focus:outline-none  text-xl"
-          @keydown.enter="checkData"
-          placeholder="Enter your city" />
+      <div class="mt-10  flex items-center gap-8">
+        <div class="relative">
+          <input
+            type="text"
+            v-model="city"
+            class="focus:outline-none text-xl"
+            @keydown.enter="checkData"
+            placeholder="Enter your city" />
+          <Autocomplete class="w-full py-4 pr-4 top-full bg-white absolute z-50 mb-8 mt-2 autocompleteShadow rounded-lg pl-2"
+                        v-if="autocompletedCities.length!== 0"
+                        @select="fillCity"
+                        :autocompleted-cities="autocompletedCities" />
+        </div>
         <button class="bg-skyBlue rounded-lg p-3 text-white cursor-pointer hover:bg-darkBlue" @click="checkData">
           Search
         </button>
       </div>
-      <div class="flex mt-6 items-start">
+      <div class="flex mt-6 z-20 items-start">
         <div>
           <div>
             Select search radius
@@ -30,10 +36,6 @@
           class="ml-4 focus:outline-none border-grey border rounded pl-2 py-1"
         />
       </div>
-      <Autocomplete class="w-80 py-4 pr-4 mb-8 mt-2 autocompleteShadow rounded-lg pl-2"
-                    v-if="autocompletedCities.length!== 0"
-                    @select="fillCity"
-                    :autocompleted-cities="autocompletedCities" />
     </div>
     <div v-if="response">
       <div class="text-3xl text-center mb-14">
@@ -84,7 +86,6 @@ const checkData = async () => {
   if (city.value !== "") {
     response.value = await getPlaceData();
     city.value = "";
-    autocompletedCities.value = [];
   }
 };
 
@@ -122,8 +123,6 @@ const options = {
 let getAutoCompletedCities = async function() {
   return await fetch(`https://wft-geo-db.p.rapidapi.com/v1/geo/cities?namePrefix=${city.value}&limit=10`, options)
     .then((e) => e.json());
-
-
 };
 
 const writeAutocompletedCities = async () => {
