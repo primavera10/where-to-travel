@@ -4,13 +4,14 @@
       type="text"
       :value="modelValue"
       @input="$emit('update:model-value', $event.target.value)"
+      @keydown.enter="$emit('select', $event.target.value)"
       class="focus:outline-none text-xl"
       placeholder="Enter your city" />
     <div class="w-full py-4 pr-4 top-full bg-white absolute z-50 mb-8 mt-2 autocompleteShadow rounded-lg pl-2"
          v-if="autocompletedCities.length!== 0">
       <div v-for="city in autocompletedCities"
            :key="city"
-           @click="$emit('update:model-value', city)"
+           @click="onCitySelect(city)"
            class="cursor-pointer hover:text-white hover:bg-skyBlue">
         {{ city }}
       </div>
@@ -28,7 +29,7 @@ const prop = defineProps({
     required: true
   }
 });
-defineEmits(["update:model-value"]);
+const emit = defineEmits(["update:model-value", "select"]);
 const autocompletedCities = ref([]);
 
 const options = {
@@ -58,6 +59,11 @@ const debounce = useDebounceFn(writeAutocompletedCities, 700);
 
 
 watch(() => prop.modelValue, debounce);
+
+function onCitySelect(city:string){
+  emit('update:model-value', city);
+  emit('select', city);
+}
 </script>
 
 <style scoped>

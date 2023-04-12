@@ -5,19 +5,8 @@
       }">
       <div class="mt-10  flex items-center gap-8">
         <Autocomplete
+          @select="checkData"
         v-model="city"/>
-<!--        <div class="relative">-->
-<!--          <input-->
-<!--            type="text"-->
-<!--            v-model="city"-->
-<!--            class="focus:outline-none text-xl"-->
-<!--            @keydown.enter="checkData"-->
-<!--            placeholder="Enter your city" />-->
-<!--          <Autocomplete class="w-full py-4 pr-4 top-full bg-white absolute z-50 mb-8 mt-2 autocompleteShadow rounded-lg pl-2"-->
-<!--                        v-if="autocompletedCities.length!== 0"-->
-<!--                        @select="fillCity"-->
-<!--                        :autocompleted-cities="autocompletedCities" />-->
-<!--        </div>-->
         <button class="bg-skyBlue rounded-lg p-3 text-white cursor-pointer hover:bg-darkBlue" @click="checkData">
           Search
         </button>
