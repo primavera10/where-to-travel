@@ -33,19 +33,19 @@
         Interesting places nearby {{ response.name }}
       </div>
       <div v-if="placesNearby" class="grid gap-4 grid-cols-3">
-        <div v-for="place in placesNearby.features" :key="place.id"
+        <div v-for="place in placesNearby" :key="place.name"
              :class="{
-          'hidden': place.properties.name === '',
+          'hidden': place.name === '',
              }"
              class=" border-black border rounded-2xl p-4">
           <div class="mb-3">
-            Name: {{ place.properties.name }}
+            Name: {{ place.name }}
           </div>
           <div class="text-grey">
-            Distance {{ Math.floor(place.properties.dist) }} meters
+            Distance {{ Math.floor(place.dist) }} meters
           </div>
           <div>
-            Rate {{ place.properties.rate }}
+            Rate {{ place.rate }}
           </div>
         </div>
       </div>
@@ -68,7 +68,7 @@ const radius = ref<string>("");
 
 
 let getPlaceData = async function() {
-  let data = await fetch(`https://api.opentripmap.com/0.1/en/places/geoname?name=${city.value}&apikey=${KEY}`);
+  let data = await fetch(`https://api.opentripmap.com/0.1/en/places/geoname?name=${encodeURIComponent(city.value)}&apikey=${KEY}`);
   return await data.json();
 };
 
@@ -84,7 +84,9 @@ let getRadiusData = async function() {
   return await data.json();
 };
 let writeRadius = async () => {
-  placesNearby.value = await getRadiusData();
+  let data = await getRadiusData();
+  let a  = data.features.map((obj: any) => Object.values(obj));
+  placesNearby.value = a.map((obj:any) => obj[3]);
 };
 
 watch(response, () => {
