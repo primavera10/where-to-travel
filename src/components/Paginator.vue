@@ -1,26 +1,29 @@
 <template>
-<div>
-</div>
+  <div class="flex items-center justify-center  gap-2 mx-auto">
+    <div v-for="page in prop.totalPages"
+         :class="{
+      'bg-darkBlue text-white': page === prop.currentPage,
+         }"
+         @click="$emit('update:current-page', page)"
+         class="border w-8 text-center p-1 border-skyBlue cursor-pointer hover:bg-skyBlue hover:text-white rounded-3xl">
+      {{ page }}
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
 const prop = defineProps({
-  sights:{
-    type:Array,
-  },
-  perPage:{
+  currentPage: {
     type: Number,
-    required: true,
+    required: true
   },
-  currentPage:{
-    type:Number,
-    required: true,
-  },
-  totalPages:{
+  totalPages: {
     type: Number,
-    required: true,
+    required: true
   }
-})
+});
+defineEmits(['update:current-page'])
+
 </script>
 
 <style scoped>
