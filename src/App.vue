@@ -6,7 +6,7 @@
       <div class="mt-10  flex items-center gap-8">
         <Autocomplete
           @select="checkData"
-        v-model="city"/>
+          v-model="city" />
         <button class="bg-skyBlue rounded-lg p-3 text-white cursor-pointer hover:bg-darkBlue" @click="checkData">
           Search
         </button>
@@ -33,42 +33,48 @@
         Interesting places nearby {{ response.name }}
       </div>
       <div v-if="placesNearby" class="grid gap-4 grid-cols-3">
-        <div v-for="place in placesNearby.features" :key="place.id"
+        <div v-for="place in itemsPage" :key="place.xid"
              :class="{
-          'hidden': place.properties.name === '',
+          'hidden': place.name === '',
              }"
              class=" border-black border rounded-2xl p-4">
           <div class="mb-3">
-            Name: {{ place.properties.name }}
+            Name: {{ place.name }}
           </div>
           <div class="text-grey">
-            Distance {{ Math.floor(place.properties.dist) }} meters
+            Distance {{ Math.floor(place.dist) }} meters
           </div>
           <div>
-            Rate {{ place.properties.rate }}
+            Rate {{ place.rate }}
           </div>
         </div>
       </div>
     </div>
+    <Paginator v-if="placesNearby"
+               v-model:current-page="currentPage"
+               :total-pages="numberOfPages"
+               class="mt-6" />
 
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import Autocomplete from "@/components/Autocomplete.vue";
+import Paginator from "@/components/Paginator.vue";
 
 
 const city = ref<string>("");
 const KEY = "5ae2e3f221c38a28845f05b6bce54ceec3074e30e4fc5e2df84867fe";
 const response = ref();
-const placesNearby = ref();
+const placesNearby = ref<Array<any>>();
 const autocompletedCities = ref([]);
 const radius = ref<string>("");
-
+const currentPage= ref<number>(1);
+const perPage = ref<number>(20);
 
 let getPlaceData = async function() {
-  let data = await fetch(`https://api.opentripmap.com/0.1/en/places/geoname?name=${city.value}&apikey=${KEY}`);
+  let data = await fetch(`https://api.opentripmap.com/0.1/en/places/geoname?name=${encodeURIComponent(city.value)}&apikey=${KEY}`);
   return await data.json();
 };
 
@@ -84,7 +90,9 @@ let getRadiusData = async function() {
   return await data.json();
 };
 let writeRadius = async () => {
-  placesNearby.value = await getRadiusData();
+  let data = await getRadiusData();
+  let a = data.features.map((obj: any) => Object.values(obj));
+  placesNearby.value = a.map((obj: any) => obj[3]);
 };
 
 watch(response, () => {
@@ -97,6 +105,21 @@ function hasRadius() {
   return (radius.value !== "") ? radius.value : "2000";
 }
 
+const numberOfPages = computed(() => {
+  if (!placesNearby.value) {
+    return 0;
+  }
+  return Math.ceil(placesNearby.value.length / perPage.value);
+});
+
+const itemsPage = computed(()=>{
+  if (!placesNearby.value){
+    return [];
+  }
+  let start = (currentPage.value-1) * perPage.value;
+  let end = perPage.value * currentPage.value - 1;
+  return placesNearby.value.slice(start, end);
+})
 </script>
 
 
