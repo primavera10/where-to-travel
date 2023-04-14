@@ -2,13 +2,15 @@
   <div class="relative">
     <input
       type="text"
+      @focus="showAutocomplete = true"
+      @blur="showAutocomplete = false"
       :value="modelValue"
       @input="$emit('update:model-value', $event.target.value)"
       @keydown.enter="$emit('select', $event.target.value)"
       class="focus:outline-none text-xl"
       placeholder="Enter your city" />
     <div class="w-full py-4 pr-4 top-full bg-white absolute z-50 mb-8 mt-2 autocompleteShadow rounded-lg pl-2"
-         v-if="autocompletedCities.length!== 0">
+         v-if="autocompletedCities.length!== 0 && showAutocomplete === true">
       <div v-for="city in autocompletedCities"
            :key="city"
            @click="onCitySelect(city)"
@@ -23,6 +25,7 @@
 import { ref, watch } from "vue";
 import { useDebounceFn } from "@vueuse/core";
 
+const showAutocomplete = ref<boolean>(false);
 const prop = defineProps({
   modelValue: {
     type: String,

@@ -32,7 +32,7 @@
       <div class="text-3xl text-center mb-14">
         Interesting places nearby {{ response.name }}
       </div>
-      <div v-if="placesNearby" class="grid gap-4 grid-cols-3">
+      <div class="grid gap-4 grid-cols-3" v-if="placesNearby.length > 0">
         <div v-for="place in itemsPage" :key="place.xid"
              :class="{
           'hidden': place.name === '',
@@ -49,11 +49,14 @@
           </div>
         </div>
       </div>
+      <Paginator
+        v-model:current-page="currentPage"
+        :total-pages="numberOfPages"
+        class="mt-6" />
     </div>
-    <Paginator v-if="placesNearby"
-               v-model:current-page="currentPage"
-               :total-pages="numberOfPages"
-               class="mt-6" />
+<!--    <div v-if="placesNearby.length === 0 && response" class="text-3xl text-center mb-14">-->
+<!--      Sorry, we haven't found any sights in {{ response.name }} :(-->
+<!--    </div>-->
 
   </div>
 </template>
@@ -67,10 +70,10 @@ import Paginator from "@/components/Paginator.vue";
 const city = ref<string>("");
 const KEY = "5ae2e3f221c38a28845f05b6bce54ceec3074e30e4fc5e2df84867fe";
 const response = ref();
-const placesNearby = ref<Array<any>>();
+const placesNearby = ref<Array<any>>([]);
 const autocompletedCities = ref([]);
 const radius = ref<string>("");
-const currentPage= ref<number>(1);
+const currentPage = ref<number>(1);
 const perPage = ref<number>(20);
 
 let getPlaceData = async function() {
@@ -112,14 +115,14 @@ const numberOfPages = computed(() => {
   return Math.ceil(placesNearby.value.length / perPage.value);
 });
 
-const itemsPage = computed(()=>{
-  if (!placesNearby.value){
+const itemsPage = computed(() => {
+  if (!placesNearby.value) {
     return [];
   }
-  let start = (currentPage.value-1) * perPage.value;
+  let start = (currentPage.value - 1) * perPage.value;
   let end = perPage.value * currentPage.value - 1;
   return placesNearby.value.slice(start, end);
-})
+});
 </script>
 
 
