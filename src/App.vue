@@ -29,35 +29,37 @@
       </div>
     </div>
     <div v-if="response">
-      <div class="text-3xl text-center mb-14">
-        Interesting places nearby {{ response.name }}
-      </div>
-      <div class="grid gap-4 grid-cols-3" v-if="placesNearby.length > 0">
-        <div v-for="place in itemsPage" :key="place.xid"
-             :class="{
+      <div v-if="placesNearby.length > 0">
+        <div class="text-3xl text-center mb-14">
+          Interesting places nearby {{ response.name }}
+        </div>
+        <div class="grid gap-4 grid-cols-3" v-if="placesNearby.length > 0">
+          <div v-for="place in itemsPage" :key="place.xid"
+               :class="{
           'hidden': place.name === '',
              }"
-             class=" border-black border rounded-2xl p-4">
-          <div class="mb-3">
-            Name: {{ place.name }}
-          </div>
-          <div class="text-grey">
-            Distance {{ Math.floor(place.dist) }} meters
-          </div>
-          <div>
-            Rate {{ place.rate }}
+               class=" border-black border rounded-2xl p-4">
+            <div class="mb-3">
+              Name: {{ place.name }}
+            </div>
+            <div class="text-grey">
+              Distance {{ Math.floor(place.dist) }} meters
+            </div>
+            <div>
+              Rate {{ place.rate }}
+            </div>
           </div>
         </div>
+        <Paginator
+          v-model:current-page="currentPage"
+          :total-pages="numberOfPages"
+          class="mt-6" />
       </div>
-      <Paginator
-        v-model:current-page="currentPage"
-        :total-pages="numberOfPages"
-        class="mt-6" />
-    </div>
-<!--    <div v-if="placesNearby.length === 0 && response" class="text-3xl text-center mb-14">-->
-<!--      Sorry, we haven't found any sights in {{ response.name }} :(-->
-<!--    </div>-->
+      <div v-else class="text-3xl text-center mb-14">
+        Sorry, we haven't found any sights in {{ response.name }} :(
+      </div>
 
+    </div>
   </div>
 </template>
 

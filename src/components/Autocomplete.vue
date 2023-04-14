@@ -2,8 +2,8 @@
   <div class="relative">
     <input
       type="text"
+      ref="target"
       @focus="showAutocomplete = true"
-      @blur="showAutocomplete = false"
       :value="modelValue"
       @input="$emit('update:model-value', $event.target.value)"
       @keydown.enter="$emit('select', $event.target.value)"
@@ -23,7 +23,8 @@
 
 <script setup lang="ts">
 import { ref, watch } from "vue";
-import { useDebounceFn } from "@vueuse/core";
+import { useDebounceFn, onClickOutside } from "@vueuse/core";
+
 
 const showAutocomplete = ref<boolean>(false);
 const prop = defineProps({
@@ -34,7 +35,8 @@ const prop = defineProps({
 });
 const emit = defineEmits(["update:model-value", "select"]);
 const autocompletedCities = ref([]);
-
+const target = ref(null);
+onClickOutside(target, () => showAutocomplete.value = false);
 const options = {
   method: "GET",
   headers: {
@@ -58,14 +60,15 @@ async function writeAutocompletedCities() {
     return elem[3];
   });
 }
+
 const debounce = useDebounceFn(writeAutocompletedCities, 700);
 
 
 watch(() => prop.modelValue, debounce);
 
-function onCitySelect(city:string){
-  emit('update:model-value', city);
-  emit('select', city);
+function onCitySelect(city: string) {
+  emit("update:model-value", city);
+  emit("select", city);
 }
 </script>
 
