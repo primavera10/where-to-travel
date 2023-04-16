@@ -64,7 +64,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import Autocomplete from "@/components/Autocomplete.vue";
 import Paginator from "@/components/Paginator.vue";
 
@@ -125,6 +125,22 @@ const itemsPage = computed(() => {
   let end = perPage.value * currentPage.value - 1;
   return placesNearby.value.slice(start, end);
 });
+
+watch(response, (newResponse) => {
+  localStorage.setItem('response-name', JSON.stringify(newResponse))
+})
+const responseData = localStorage.getItem('response-name');
+
+function getFromLocalStorage(data:any){
+  if (!data){
+    return;
+  }
+  response.value = JSON.parse(data);
+}
+
+onMounted(()=> {
+  getFromLocalStorage(responseData);
+})
 </script>
 
 
