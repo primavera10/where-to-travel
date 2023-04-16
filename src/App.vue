@@ -98,6 +98,7 @@ let writeRadius = async () => {
   let data = await getRadiusData();
   let a = data.features.map((obj: any) => Object.values(obj));
   placesNearby.value = a.map((obj: any) => obj[3]);
+  currentPage.value = 1;
 };
 
 watch(response, () => {
@@ -149,10 +150,11 @@ if (windowData.page){
   currentPage.value = +windowData.page;
 }
 
-watch(currentPage, (newPage, oldPage) =>{
-  const p = oldPage!== newPage ? newPage : oldPage;
+watch([currentPage,response], ([newPage, newResponse], [oldPage, oldResponse]) =>{
+  let p = oldPage!== newPage ? newPage : oldPage;
+  const resp = newResponse!==oldResponse ? newResponse : oldResponse;
   window.history.pushState(null, document.title,
-    `${window.location.pathname}?page=${p}`)
+    `${window.location.pathname}?city=${resp.name}&page=${p}`)
 })
 </script>
 
