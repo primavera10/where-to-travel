@@ -64,7 +64,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import Autocomplete from "@/components/Autocomplete.vue";
 import Paginator from "@/components/Paginator.vue";
 
@@ -98,6 +98,7 @@ let writeRadius = async () => {
   let data = await getRadiusData();
   let a = data.features.map((obj: any) => Object.values(obj));
   placesNearby.value = a.map((obj: any) => obj[3]);
+  currentPage.value = 1;
 };
 
 watch(response, () => {
@@ -125,6 +126,36 @@ const itemsPage = computed(() => {
   let end = perPage.value * currentPage.value - 1;
   return placesNearby.value.slice(start, end);
 });
+
+watch(response, (newResponse) => {
+  localStorage.setItem('response-name', JSON.stringify(newResponse))
+})
+const responseData = localStorage.getItem('response-name');
+
+function getFromLocalStorage(data:any){
+  if (!data){
+    return;
+  }
+  response.value = JSON.parse(data);
+}
+
+onMounted(()=> {
+  getFromLocalStorage(responseData);
+})
+
+const windowData = Object.fromEntries(
+  new URL(window.location.href).searchParams.entries()
+);
+if (windowData.page){
+  currentPage.value = +windowData.page;
+}
+
+watch([currentPage,response], ([newPage, newResponse], [oldPage, oldResponse]) =>{
+  let p = oldPage!== newPage ? newPage : oldPage;
+  const resp = newResponse!==oldResponse ? newResponse : oldResponse;
+  window.history.pushState(null, document.title,
+    `${window.location.pathname}?city=${resp.name}&page=${p}`)
+})
 </script>
 
 

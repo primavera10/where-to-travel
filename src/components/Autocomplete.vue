@@ -12,10 +12,10 @@
     <div class="w-full py-4 pr-4 top-full bg-white absolute z-50 mb-8 mt-2 autocompleteShadow rounded-lg pl-2"
          v-if="autocompletedCities.length!== 0 && showAutocomplete === true">
       <div v-for="city in autocompletedCities"
-           :key="city"
-           @click="onCitySelect(city)"
+           :key="city[0]"
+           @click="onCitySelect(city[1])"
            class="cursor-pointer hover:text-white hover:bg-skyBlue">
-        {{ city }}
+        {{ city[1] }}
       </div>
     </div>
   </div>
@@ -57,7 +57,7 @@ async function writeAutocompletedCities() {
   let data = await getAutoCompletedCities(prop.modelValue);
   let a = data.data.map((obj: any) => Object.values(obj));
   autocompletedCities.value = a.map((elem: Array<any>) => {
-    return elem[3];
+    return [elem[0],elem[3]];
   });
 }
 
