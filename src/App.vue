@@ -141,6 +141,19 @@ function getFromLocalStorage(data:any){
 onMounted(()=> {
   getFromLocalStorage(responseData);
 })
+
+const windowData = Object.fromEntries(
+  new URL(window.location.href).searchParams.entries()
+);
+if (windowData.page){
+  currentPage.value = +windowData.page;
+}
+
+watch(currentPage, (newPage, oldPage) =>{
+  const p = oldPage!== newPage ? newPage : oldPage;
+  window.history.pushState(null, document.title,
+    `${window.location.pathname}?page=${p}`)
+})
 </script>
 
 
