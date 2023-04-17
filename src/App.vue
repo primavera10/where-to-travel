@@ -7,7 +7,7 @@
         <Autocomplete
           @select="checkData"
           v-model:model-value="city"
-          v-model:history="responseHistory"/>
+          :history="responseHistory" />
         <button class="bg-skyBlue rounded-lg p-3 text-white cursor-pointer hover:bg-darkBlue" @click="checkData">
           Search
         </button>
@@ -65,7 +65,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, onMounted, type Ref, ref, watch } from "vue";
 import Autocomplete from "@/components/Autocomplete.vue";
 import Paginator from "@/components/Paginator.vue";
 
@@ -78,7 +78,7 @@ const autocompletedCities = ref([]);
 const radius = ref<string>("");
 const currentPage = ref<number>(1);
 const perPage = ref<number>(20);
-const responseHistory= ref<Array<string>>([]);
+const responseHistory = ref([]);
 
 let getPlaceData = async function() {
   let data = await fetch(`https://api.opentripmap.com/0.1/en/places/geoname?name=${encodeURIComponent(city.value)}&apikey=${KEY}`);
@@ -88,7 +88,6 @@ let getPlaceData = async function() {
 const checkData = async () => {
   if (city.value !== "") {
     response.value = await getPlaceData();
-    responseHistory.value.push(response.value.name);
     city.value = "";
   }
 };
@@ -107,6 +106,7 @@ let writeRadius = async () => {
 watch(response, () => {
   if (response.value !== "") {
     writeRadius();
+    checkResponseHistory(response.value.name, responseHistory);
   }
 });
 
@@ -131,35 +131,57 @@ const itemsPage = computed(() => {
 });
 
 watch(response, (newResponse) => {
-  localStorage.setItem('response-name', JSON.stringify(newResponse))
-})
-const responseData = localStorage.getItem('response-name');
+  localStorage.setItem("response-name", JSON.stringify(newResponse));
+});
+const responseData = localStorage.getItem("response-name");
 
-function getFromLocalStorage(data:any){
-  if (!data){
+function getFromLocalStorage(data: any) {
+  if (!data) {
     return;
   }
   response.value = JSON.parse(data);
 }
 
-onMounted(()=> {
+onMounted(() => {
   getFromLocalStorage(responseData);
-})
+  getHistoryFromLocalStorage(historyData);
+});
 
 const windowData = Object.fromEntries(
   new URL(window.location.href).searchParams.entries()
 );
-if (windowData.page){
+if (windowData.page) {
   currentPage.value = +windowData.page;
 }
 
-watch([currentPage,response], ([newPage, newResponse], [oldPage, oldResponse]) =>{
-  let p = oldPage!== newPage ? newPage : oldPage;
-  const resp = newResponse!==oldResponse ? newResponse : oldResponse;
+watch([currentPage, response], ([newPage, newResponse], [oldPage, oldResponse]) => {
+  let p = oldPage !== newPage ? newPage : oldPage;
+  const resp = newResponse !== oldResponse ? newResponse : oldResponse;
   window.history.pushState(null, document.title,
-    `${window.location.pathname}?city=${resp.name}&page=${p}`)
-})
+    `${window.location.pathname}?city=${resp.name}&page=${p}`);
+});
 
+function checkResponseHistory(city: string, arr: Ref<Array<string>>) {
+  if (arr.value.includes(city) && arr.value.length < 11) {
+    return;
+  } else if (arr.value.length > 10) {
+    arr.value.push(city);
+    let a = arr.value.shift();
+    return arr;
+  } else return arr.value.push(city);
+}
+
+watch(responseHistory, (newHistory) => {
+  localStorage.setItem("history", JSON.stringify(newHistory));
+}, {deep: true});
+const historyData = localStorage.getItem("history");
+
+function getHistoryFromLocalStorage(data: any) {
+  if (!data) {
+    return;
+  }
+  responseHistory.value = JSON.parse(data);
+}
 </script>
 
 

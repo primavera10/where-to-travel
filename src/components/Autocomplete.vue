@@ -46,7 +46,7 @@ const prop = defineProps({
     required:true
   }
 });
-const emit = defineEmits(["update:model-value", "select"]);
+const emit = defineEmits(["update:model-value", "select", "update:history"]);
 const autocompletedCities = ref([]);
 const target = ref(null);
 onClickOutside(target, () => showAutocomplete.value = false);
@@ -81,10 +81,6 @@ watch(() => prop.modelValue, debounce);
 
 function onCitySelect(city: string) {
   emit("update:model-value", city);
-  emit("select", city);
-}
-function onHistorySelect(city:string){
-  emit("update:history", city);
   emit("select", city);
 }
 </script>
