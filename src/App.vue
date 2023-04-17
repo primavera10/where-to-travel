@@ -6,7 +6,8 @@
       <div class="mt-10  flex items-center gap-8">
         <Autocomplete
           @select="checkData"
-          v-model="city" />
+          v-model:model-value="city"
+          v-model:history="responseHistory"/>
         <button class="bg-skyBlue rounded-lg p-3 text-white cursor-pointer hover:bg-darkBlue" @click="checkData">
           Search
         </button>
@@ -77,6 +78,7 @@ const autocompletedCities = ref([]);
 const radius = ref<string>("");
 const currentPage = ref<number>(1);
 const perPage = ref<number>(20);
+const responseHistory= ref<Array<string>>([]);
 
 let getPlaceData = async function() {
   let data = await fetch(`https://api.opentripmap.com/0.1/en/places/geoname?name=${encodeURIComponent(city.value)}&apikey=${KEY}`);
@@ -86,6 +88,7 @@ let getPlaceData = async function() {
 const checkData = async () => {
   if (city.value !== "") {
     response.value = await getPlaceData();
+    responseHistory.value.push(response.value.name);
     city.value = "";
   }
 };
@@ -156,6 +159,7 @@ watch([currentPage,response], ([newPage, newResponse], [oldPage, oldResponse]) =
   window.history.pushState(null, document.title,
     `${window.location.pathname}?city=${resp.name}&page=${p}`)
 })
+
 </script>
 
 
