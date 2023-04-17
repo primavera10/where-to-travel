@@ -18,6 +18,15 @@
         {{ city[1] }}
       </div>
     </div>
+    <div  class="w-full py-4 pr-4 top-full bg-white absolute z-50 mb-8 mt-2 autocompleteShadow rounded-lg pl-2"
+          v-if="autocompletedCities.length === 0 && showAutocomplete === true && history.length > 0">
+      <div v-for="city in history"
+           :key="city"
+           @click="onCitySelect(city)"
+           class="cursor-pointer hover:text-white hover:bg-skyBlue">
+        {{ city }}
+      </div>
+    </div>
   </div>
 </template>
 
@@ -31,9 +40,13 @@ const prop = defineProps({
   modelValue: {
     type: String,
     required: true
+  },
+  history:{
+    type: Array,
+    required:true
   }
 });
-const emit = defineEmits(["update:model-value", "select"]);
+const emit = defineEmits(["update:model-value", "select", "update:history"]);
 const autocompletedCities = ref([]);
 const target = ref(null);
 onClickOutside(target, () => showAutocomplete.value = false);
