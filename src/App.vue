@@ -34,7 +34,7 @@
         <div class="text-3xl text-center mb-14">
           Interesting places nearby <span class="text-skyBlue">{{ response.name }} </span>
         </div>
-        <div class="grid gap-4 grid-cols-3" v-if="placesNearby.length > 0">
+        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" v-if="placesNearby.length > 0">
           <div v-for="place in itemsPage" :key="place.xid"
                class=" border-black border rounded-2xl p-4">
             <div class="mb-3">
