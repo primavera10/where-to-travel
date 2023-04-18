@@ -36,9 +36,6 @@
         </div>
         <div class="grid gap-4 grid-cols-3" v-if="placesNearby.length > 0">
           <div v-for="place in itemsPage" :key="place.xid"
-               :class="{
-          'hidden': place.name === '',
-             }"
                class=" border-black border rounded-2xl p-4">
             <div class="mb-3">
               Name: {{ place.name }}
@@ -77,7 +74,7 @@ const placesNearby = ref<Array<any>>([]);
 const autocompletedCities = ref([]);
 const radius = ref<string>("");
 const currentPage = ref<number>(1);
-const perPage = ref<number>(20);
+const perPage = ref<number>(22);
 const responseHistory = ref([]);
 
 let getPlaceData = async function() {
@@ -99,7 +96,8 @@ let getRadiusData = async function() {
 let writeRadius = async () => {
   let data = await getRadiusData();
   let a = data.features.map((obj: any) => Object.values(obj));
-  placesNearby.value = a.map((obj: any) => obj[3]);
+  let b  = a.map((obj: any) => obj[3]);
+  placesNearby.value = b.filter((obj: any) => obj.name!== "" )
   currentPage.value = 1;
 };
 
