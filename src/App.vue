@@ -1,9 +1,9 @@
 <template>
-  <div class="p-12">
+  <div class="p-6 sm:p-12">
     <div class="flex flex-col  items-center" :class="{
         'mb-14': autocompletedCities.length === 0,
       }">
-      <div class="mt-10  flex items-center gap-8">
+      <div class="mt-10  flex items-center gap-2 sm:gap-8">
         <Autocomplete
           @select="checkData"
           v-model:model-value="city"
@@ -13,8 +13,8 @@
         </button>
       </div>
       <div class="flex mt-6 z-20 items-start">
-        <div>
-          <div>
+        <div >
+          <div class="text-xs sm:text-sm">
             Select search radius
           </div>
           <div class="mt-1 text-grey text-xs">
@@ -25,7 +25,7 @@
           type="text"
           v-model="radius"
           placeholder="max 10000"
-          class="ml-4 focus:outline-none border-grey border rounded pl-2 py-1"
+          class="ml-2 sm:ml-4 focus:outline-none border-grey border rounded pl-2 py-1"
         />
       </div>
     </div>
@@ -118,6 +118,7 @@ const numberOfPages = computed(() => {
   }
   return Math.ceil(placesNearby.value.length / perPage.value);
 });
+
 
 const itemsPage = computed(() => {
   if (!placesNearby.value) {
