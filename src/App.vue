@@ -32,7 +32,7 @@
     <div v-if="response">
       <div v-if="placesNearby.length > 0">
         <div class="text-3xl text-center mb-14">
-          Interesting places nearby {{ response.name }}
+          Interesting places nearby <span class="text-skyBlue">{{ response.name }} </span>
         </div>
         <div class="grid gap-4 grid-cols-3" v-if="placesNearby.length > 0">
           <div v-for="place in itemsPage" :key="place.xid"
@@ -57,7 +57,7 @@
           class="mt-6" />
       </div>
       <div v-else class="text-3xl text-center mb-14">
-        Sorry, we haven't found any sights in {{ response.name }} :(
+        Sorry, we haven't found any sights in <span class="text-slyBlue">{{ response.name }}</span> :(
       </div>
 
     </div>
@@ -173,7 +173,7 @@ function checkResponseHistory(city: string, arr: Ref<Array<string>>) {
 
 watch(responseHistory, (newHistory) => {
   localStorage.setItem("history", JSON.stringify(newHistory));
-}, {deep: true});
+}, { deep: true });
 const historyData = localStorage.getItem("history");
 
 function getHistoryFromLocalStorage(data: any) {
