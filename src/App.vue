@@ -1,5 +1,5 @@
 <template>
-  <div class="p-6 sm:p-12 bg-white text-black">
+  <div class="p-6 sm:p-12 bg-white text-black min-h-[100vh]">
     <div class="flex flex-col  items-center" :class="{
         'mb-14': autocompletedCities.length === 0,
       }">

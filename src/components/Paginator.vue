@@ -52,10 +52,10 @@ const visiblePages = computed(() => {
   let min = Math.max(prop.currentPage - buffer, 1);
   let max = Math.min(prop.currentPage + buffer, prop.totalPages);
   if (prop.currentPage - 1 <= buffer) {
-    max = 1 + buffer * 2;
+    max = Math.min(1 + buffer * 2, prop.totalPages);
   }
   if (prop.totalPages - prop.currentPage <= buffer ){
-    min = prop.totalPages - buffer * 2;
+    min = Math.max(prop.totalPages - buffer * 2, 1) ;
   }
   const arr = [];
   for (let i = min; i <= max; i++) {
