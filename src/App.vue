@@ -12,7 +12,7 @@
           Search
         </button>
       </div>
-      <div class="flex mt-6 z-20 items-start">
+      <div class="flex gap-2 sm:gap-4 mt-6 z-20 items-start">
         <div>
           <div class="text-xs sm:text-sm">
             Select search radius
@@ -27,14 +27,19 @@
           max="10000"
           v-model="radius"
           placeholder="max 10000"
-          class="ml-2 sm:ml-4 focus:outline-none border-grey border rounded pl-2 py-1"
+          class=" focus:outline-none border-grey border rounded pl-2 py-1"
         />
+        <select v-model="select" class="focus:outline-none">
+          <option value="rate"> Sort by rate</option>
+          <option value="distance"> Sort by distance</option>
+        </select>
       </div>
     </div>
     <div v-if="response">
       <div v-if="placesNearby.length > 0">
         <div class="text-3xl text-center mb-14">
-          Interesting places nearby <span class="text-skyBlue">{{ response.name }}</span> in <span class="text-skyBlue">{{ radius }}</span>
+          Interesting places nearby <span class="text-skyBlue">{{ response.name }}</span> in <span class="text-skyBlue">{{ radius
+          }}</span>
           meters
         </div>
         <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" v-if="placesNearby.length > 0">
@@ -79,6 +84,7 @@ const radius = ref<string>("2000");
 const currentPage = ref<number>(1);
 const perPage = ref<number>(22);
 const responseHistory = ref([]);
+const select = ref("distance");
 
 let getPlaceData = async function() {
   let data = await fetch(`https://api.opentripmap.com/0.1/en/places/geoname?name=${encodeURIComponent(city.value)}&apikey=${KEY}`);
@@ -124,9 +130,25 @@ const itemsPage = computed(() => {
   if (!placesNearby.value) {
     return [];
   }
+  let arr = [];
+  if (select.value === "rate") {
+    arr = [...placesNearby.value].sort((a: any, b: any) => {
+      if (a.rate < b.rate) {
+        return 1;
+      }
+      if (a.rate > b.rate) {
+        return -1;
+      } else {
+        return 0;
+      }
+    });
+  }
+  if (select.value === "distance") {
+    arr = placesNearby.value;
+  }
   let start = (currentPage.value - 1) * perPage.value;
   let end = perPage.value * currentPage.value - 1;
-  return placesNearby.value.slice(start, end);
+  return arr.slice(start, end);
 });
 
 watch(response, (newResponse) => {
@@ -181,11 +203,30 @@ function getHistoryFromLocalStorage(data: any) {
   }
   responseHistory.value = JSON.parse(data);
 }
-watch (radius, () =>{
-  if (response.value!= null){
+
+watch(radius, () => {
+  if (response.value != null) {
     writeRadius();
   }
-})
+});
+
+// const sortedPlaces = computed(() => {
+//   if (select.value === "rate") {
+//     return placesNearby.value.sort((a: any, b: any) => {
+//       if (a.rate < b.rate) {
+//         return 1;
+//       }
+//       if (a.rate > b.rate) {
+//         return -1;
+//       } else {
+//         return 0;
+//       }
+//     });
+//   } else {
+//     return placesNearby.value;
+//   }
+// });
+
 </script>
 
 
