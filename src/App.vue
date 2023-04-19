@@ -12,23 +12,25 @@
           Search
         </button>
       </div>
-      <div class="flex gap-2 sm:gap-4 mt-6 z-20 items-start">
-        <div>
-          <div class="text-xs sm:text-sm">
-            Select search radius
+      <div class="flex flex-col sm:flex-row gap-4  mt-6 z-20 items-center sm:items-start">
+        <div class="flex gap-2 sm:block">
+          <div>
+            <div class="text-sm">
+              Select search radius
+            </div>
+            <div class="mt-1 text-grey text-xs">
+              *Default - 2000 meters
+            </div>
           </div>
-          <div class="mt-1 text-grey text-xs">
-            *Default - 2000 meters
-          </div>
+          <input
+            type="range"
+            min="10"
+            max="10000"
+            v-model="radius"
+            placeholder="max 10000"
+            class=" focus:outline-none border-grey border rounded pl-2 py-1"
+          />
         </div>
-        <input
-          type="range"
-          min="10"
-          max="10000"
-          v-model="radius"
-          placeholder="max 10000"
-          class=" focus:outline-none border-grey border rounded pl-2 py-1"
-        />
         <select v-model="select" class="focus:outline-none">
           <option value="rate"> Sort by rate</option>
           <option value="distance"> Sort by distance</option>
