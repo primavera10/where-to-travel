@@ -13,7 +13,7 @@
         </button>
       </div>
       <div class="flex mt-6 z-20 items-start">
-        <div >
+        <div>
           <div class="text-xs sm:text-sm">
             Select search radius
           </div>
@@ -22,7 +22,9 @@
           </div>
         </div>
         <input
-          type="text"
+          type="range"
+          min="10"
+          max="10000"
           v-model="radius"
           placeholder="max 10000"
           class="ml-2 sm:ml-4 focus:outline-none border-grey border rounded pl-2 py-1"
@@ -32,7 +34,8 @@
     <div v-if="response">
       <div v-if="placesNearby.length > 0">
         <div class="text-3xl text-center mb-14">
-          Interesting places nearby <span class="text-skyBlue">{{ response.name }} </span>
+          Interesting places nearby <span class="text-skyBlue">{{ response.name }}</span> in <span class="text-skyBlue">{{ radius }}</span>
+          meters
         </div>
         <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" v-if="placesNearby.length > 0">
           <div v-for="place in itemsPage" :key="place.xid"
@@ -72,7 +75,7 @@ const KEY = "5ae2e3f221c38a28845f05b6bce54ceec3074e30e4fc5e2df84867fe";
 const response = ref();
 const placesNearby = ref<Array<any>>([]);
 const autocompletedCities = ref([]);
-const radius = ref<string>("");
+const radius = ref<string>("2000");
 const currentPage = ref<number>(1);
 const perPage = ref<number>(22);
 const responseHistory = ref([]);
@@ -90,27 +93,24 @@ const checkData = async () => {
 };
 
 let getRadiusData = async function() {
-  let data = await fetch(`https://api.opentripmap.com/0.1/en/places/radius?radius=${hasRadius()}&lon=${response.value.lon}&lat=${response.value.lat}&apikey=${KEY}`);
+  let data = await fetch(`https://api.opentripmap.com/0.1/en/places/radius?radius=${radius.value}&lon=${response.value.lon}&lat=${response.value.lat}&apikey=${KEY}`);
   return await data.json();
 };
 let writeRadius = async () => {
   let data = await getRadiusData();
   let a = data.features.map((obj: any) => Object.values(obj));
-  let b  = a.map((obj: any) => obj[3]);
-  placesNearby.value = b.filter((obj: any) => obj.name!== "" )
+  let b = a.map((obj: any) => obj[3]);
+  placesNearby.value = b.filter((obj: any) => obj.name !== "");
   currentPage.value = 1;
 };
 
 watch(response, () => {
-  if (response.value !== "") {
+  if (response.value != null) {
     writeRadius();
     checkResponseHistory(response.value.name, responseHistory);
   }
 });
 
-function hasRadius() {
-  return (radius.value !== "") ? radius.value : "2000";
-}
 
 const numberOfPages = computed(() => {
   if (!placesNearby.value) {
@@ -181,6 +181,11 @@ function getHistoryFromLocalStorage(data: any) {
   }
   responseHistory.value = JSON.parse(data);
 }
+watch (radius, () =>{
+  if (response.value!= null){
+    writeRadius();
+  }
+})
 </script>
 
 
